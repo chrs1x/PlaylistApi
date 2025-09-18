@@ -17,7 +17,18 @@ namespace PlaylistApi.Services.PlaylistService
         }
         public async Task<IEnumerable<Playlist>> GetAllPlaylists() =>
             await _context.Playlists.ToListAsync();
-        public async Task<IEnumerable<Playlist>> GetUserPlaylists(int userId);
+
+        // User action
+        public async Task<IEnumerable<Playlist>> GetUserPlaylists(int userId)
+        {
+            var user = await _context.Users
+                .Include(p => p.Playlists)
+                .FirstOrDefaultAsync(p => p.Id == userId);
+
+            if (user == null) throw new Exception("User not found.");
+
+            return user.Playlists;
+        }
         public async Task<Playlist?> GetPlaylistById(int id) =>
             await _context.Playlists.FindAsync(id);
         public async Task<Playlist> CreatePlaylist(CreatePlaylistDto dto, int userId)
