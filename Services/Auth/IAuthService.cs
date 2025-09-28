@@ -1,4 +1,4 @@
-﻿using PlaylistApi.DTOs.Auth;
+﻿using PlaylistApi.DTOs.AuthDtos;
 namespace PlaylistApi.Services.Auth
 {
     public interface IAuthService

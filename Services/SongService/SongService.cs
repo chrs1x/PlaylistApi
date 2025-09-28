@@ -93,7 +93,7 @@ namespace PlaylistApi.Services.SongService
                 .Include(p => p.Songs)
                 .FirstOrDefaultAsync(p => p.Id == playlistId);
 
-            if (playlist == null) throw new Exception("Playlist not found.");
+            if (playlist == null) throw new KeyNotFoundException("Playlist not found.");
 
             var song = await _context.Songs.FindAsync(songId);
             if (song == null) throw new KeyNotFoundException("Song not found.");

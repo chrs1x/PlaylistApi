@@ -4,7 +4,7 @@ using PlaylistApi.DTOs.SongDtos;
 using PlaylistApi.Models;
 using PlaylistApi.Services.SongService;
 
-namespace Playlist_API.Controllers
+namespace PlaylistApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -38,6 +38,7 @@ namespace Playlist_API.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult<Song>> UpdateSong(int id, [FromBody] UpdateSongDto dto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
                 var updatedSong = await _songService.UpdateSong(id, dto);
@@ -58,7 +59,7 @@ namespace Playlist_API.Controllers
 
         // User actions
 
-        [HttpGet("/api/playlists/{playlistId}/songs")]
+        [HttpGet("~/api/playlists/{playlistId}/songs")]
         public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId) 
             => Ok(await _songService.GetSongsForPlaylist(playlistId));
 
@@ -73,7 +74,7 @@ namespace Playlist_API.Controllers
         public async Task<ActionResult<Song>> RemoveSongFromPlaylist(int playlistId, int songId)
         {
             var success = await _songService.RemoveSongFromPlaylist(playlistId, songId);
-            return success == null ? NotFound() : NoContent();
+            return success == null ? NotFound() : Ok(success);
         }
     }
 }

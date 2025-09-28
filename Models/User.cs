@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Username { get; set; }
         public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public byte[] PasswordKey { get; set; }
         public string Role { get; set; }
 
         public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
