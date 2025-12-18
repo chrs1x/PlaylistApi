@@ -1,7 +1,9 @@
-﻿using PlaylistApi.Data;
-using PlaylistApi.DTOs.SongDtos;
+﻿using Microsoft.EntityFrameworkCore;
+using Playlist_API.DTOs.SongDtos;
+using PlaylistApi.Services.SongService;
 using PlaylistApi.Models;
-using Microsoft.EntityFrameworkCore;
+using PlaylistApi.Data;
+using PlaylistApi.DTOs.SongDtos;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -58,21 +60,32 @@ namespace PlaylistApi.Services.SongService
         }
 
         // User Actions
-        public async Task<IEnumerable<Song>> GetSongsForPlaylist(int playlistId)
+        public async Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId)
         {
-            var playlist = await _context.Playlists
-                .Include(p => p.Songs)
-                .FirstOrDefaultAsync(p => p.Id == playlistId);
+            var playlistSongs = await _context.PlaylistSongs
+                .Where(ps => ps.PlaylistId == playlistId)
+                .Include(ps => ps.Song)
+                .OrderBy(ps => ps.Order)
+                .Select(ps => new SongWithPlaylistData
+                {
+                    SongId = ps.Song.Id,
+                    Title = ps.Song.Title,
+                    Artist = ps.Song.Artist,
+                    Duration = ps.Song.Duration,
+                    AddedAt = ps.AddedAt,
+                    Order = ps.Order,
+                    PlayCount = ps.PlayCount,
+                    Notes = ps.Notes
+                })
+                .ToListAsync();
 
-            if (playlist == null) throw new Exception("Playlist not found.");
-
-            return playlist.Songs;
+            return playlistSongs;
             
         }
-        public async Task<Song> AddSongToPlaylist(int playlistId, int songId)
+        public async Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId)
         {
             var playlist = await _context.Playlists
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
                 .FirstOrDefaultAsync(p => p.Id == playlistId);
 
             if (playlist == null) throw new Exception("Playlist not found.");
@@ -80,28 +93,42 @@ namespace PlaylistApi.Services.SongService
             var song = await _context.Songs.FindAsync(songId);
             if (song == null) throw new KeyNotFoundException("Song not found.");
 
-            if(!playlist.Songs.Any(s => s.Id == songId))
+            var exists = await _context.PlaylistSongs
+                .AnyAsync(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
+
+            if (exists) throw new InvalidOperationException("Song is already in this playlist.");
+
+            var maxOrder = await _context.PlaylistSongs
+                .Where(ps => ps.PlaylistId == playlistId)
+                .MaxAsync(ps => (int?)ps.Order) ?? 0; // if playlist is empty, max order = 0;
+
+            var playlistSong = new PlaylistSong
             {
-                playlist.Songs.Add(song);
-                await _context.SaveChangesAsync();
-            }
-            return song;
-        }
-        public async Task<Song> RemoveSongFromPlaylist(int playlistId, int songId)
-        {
-            var playlist = await _context.Playlists
-                .Include(p => p.Songs)
-                .FirstOrDefaultAsync(p => p.Id == playlistId);
+                PlaylistId = playlistId,
+                SongId = songId,
+                AddedAt = DateTime.UtcNow,
+                Order = maxOrder + 1,
+                PlayCount = 0,
+                Notes = null
+            };
 
-            if (playlist == null) throw new KeyNotFoundException("Playlist not found.");
-
-            var song = await _context.Songs.FindAsync(songId);
-            if (song == null) throw new KeyNotFoundException("Song not found.");
-
-            playlist.Songs.Remove(song);
+            _context.PlaylistSongs.Add(playlistSong);
             await _context.SaveChangesAsync();
 
-            return song;
+            return playlistSong;
+        }
+        public async Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId)
+        {
+            var playlistSong = await _context.PlaylistSongs
+                .FirstOrDefaultAsync(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
+
+            if (playlistSong == null)
+                throw new KeyNotFoundException("Song not found in this playlist.");
+
+            _context.PlaylistSongs.Remove(playlistSong);
+            await _context.SaveChangesAsync();
+
+            return playlistSong;
         }
     }
 }

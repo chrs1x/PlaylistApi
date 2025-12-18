@@ -60,21 +60,50 @@ namespace PlaylistApi.Controllers
         // User actions
 
         [HttpGet("~/api/playlists/{playlistId}/songs")]
-        public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId) 
-            => Ok(await _songService.GetSongsForPlaylist(playlistId));
+        public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId)
+        {
+            try
+            {
+                var songs = await _songService.GetSongsForPlaylist(playlistId);
+                return Ok(songs);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+   
 
         [HttpPost("/api/playlists/{playlistId}/songs/{songId}")]
         public async Task<ActionResult<Song>> AddSongToPlaylist(int playlistId, int songId)
         {
-            var song = await _songService.AddSongToPlaylist(playlistId, songId);
-            return Ok(song);
+            try
+            {
+                var playlistSong = await _songService.AddSongToPlaylist(playlistId, songId);
+                return Ok(playlistSong);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpDelete("/api/playlists/{playlistId}/songs/{songId}")]
         public async Task<ActionResult<Song>> RemoveSongFromPlaylist(int playlistId, int songId)
         {
-            var success = await _songService.RemoveSongFromPlaylist(playlistId, songId);
-            return success == null ? NotFound() : Ok(success);
+            try
+            {
+                var playlistSong = await _songService.RemoveSongFromPlaylist(playlistId, songId);
+                return Ok(playlistSong);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }

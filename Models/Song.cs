@@ -1,4 +1,6 @@
-﻿namespace PlaylistApi.Models
+﻿using PlaylistApi.Models;
+
+namespace PlaylistApi.Models
 {
     public class Song
     {
@@ -7,6 +9,6 @@
         public string Artist { get; set; }
         public TimeSpan? Duration { get; set; }
 
-        public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
+        public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PlaylistApi.Models
+﻿using PlaylistApi.Models;
+
+namespace PlaylistApi.Models
 {
     public class Playlist
     {
@@ -9,6 +11,6 @@
         public int UserId { get; set; }
         public User User { get; set; }
 
-        public ICollection<Song> Songs { get; set; } = new List<Song>();
+        public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
     }
 }

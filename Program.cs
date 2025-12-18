@@ -9,8 +9,6 @@ using PlaylistApi.Services.SongService;
 using PlaylistApi.Utils;
 using System.Text;
 
-// get jwtbearer
-// fix program.cs
 
 
 var builder = WebApplication.CreateBuilder(args);

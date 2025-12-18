@@ -1,5 +1,6 @@
 ﻿using PlaylistApi.Models;
 using PlaylistApi.DTOs.SongDtos;
+using Playlist_API.DTOs.SongDtos;
 namespace PlaylistApi.Services.SongService
 {
     public interface ISongService
@@ -12,9 +13,9 @@ namespace PlaylistApi.Services.SongService
         Task<Song> DeleteSong(int id);
 
         // User actions
-        Task<IEnumerable<Song>> GetSongsForPlaylist(int playlistId);
-        Task<Song> AddSongToPlaylist(int playlistId, int songId);
-        Task<Song> RemoveSongFromPlaylist(int playlistId, int songId);
+        Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId);
+        Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId);
+        Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId);
 
     }
 }
