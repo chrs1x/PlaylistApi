@@ -1,6 +1,6 @@
 ﻿using PlaylistApi.Models;
 using PlaylistApi.DTOs.SongDtos;
-using Playlist_API.DTOs.SongDtos;
+using PlaylistApi.DTOs.SongDtos;
 namespace PlaylistApi.Services.SongService
 {
     public interface ISongService

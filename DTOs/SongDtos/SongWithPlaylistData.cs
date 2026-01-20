@@ -1,4 +1,4 @@
-﻿namespace Playlist_API.DTOs.SongDtos
+﻿namespace PlaylistApi.DTOs.SongDtos
 {
     public class SongWithPlaylistData
     {

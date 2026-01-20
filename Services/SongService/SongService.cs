@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Playlist_API.DTOs.SongDtos;
+using PlaylistApi.DTOs.SongDtos;
 using PlaylistApi.Services.SongService;
 using PlaylistApi.Models;
 using PlaylistApi.Data;
-using PlaylistApi.DTOs.SongDtos;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 

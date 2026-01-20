@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlaylistApi.DTOs.SongDtos;
 using PlaylistApi.Models;
@@ -8,6 +9,7 @@ namespace PlaylistApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SongsController : ControllerBase
     {
         private readonly ISongService _songService;
@@ -18,9 +20,11 @@ namespace PlaylistApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Song>>> GetAllSongs() => Ok(await _songService.GetAllSongs());
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Song?>> GetSongById(int id)
         {
             var song = await _songService.GetSongById(id);
@@ -28,6 +32,7 @@ namespace PlaylistApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> CreateSong([FromBody] CreateSongDto dto)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -36,6 +41,7 @@ namespace PlaylistApi.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> UpdateSong(int id, [FromBody] UpdateSongDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -51,6 +57,7 @@ namespace PlaylistApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> DeleteSong(int id)
         {
             var success = await _songService.DeleteSong(id);
@@ -60,6 +67,7 @@ namespace PlaylistApi.Controllers
         // User actions
 
         [HttpGet("~/api/playlists/{playlistId}/songs")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId)
         {
             try
