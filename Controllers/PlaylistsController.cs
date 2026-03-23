@@ -31,8 +31,19 @@ namespace PlaylistApi.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var isAdmin = User.IsInRole("Admin");
 
-            var playlist = await _playlistService.GetPlaylistById(id, userId, isAdmin);
-            return playlist == null ? NotFound() : Ok(playlist);
+            try
+            {
+                var playlist = await _playlistService.GetPlaylistById(id, userId, isAdmin);
+                return Ok(playlist);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
         }
 
         [HttpPost]

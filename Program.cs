@@ -23,6 +23,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+        var key = Environment.GetEnvironmentVariable("JWT_KEY")
+            ?? throw new Exception("JWT_KEY environment variable is not set");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

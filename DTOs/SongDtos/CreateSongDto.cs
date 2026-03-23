@@ -7,7 +7,7 @@ namespace PlaylistApi.DTOs.SongDtos
         [Required(ErrorMessage = "Title is required")]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "Title is required")]
+        [Required(ErrorMessage = "Artist is required")]
         public string Artist { get; set; }
         public TimeSpan? Duration { get; set; }
     }
