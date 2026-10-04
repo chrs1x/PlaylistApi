@@ -13,10 +13,11 @@ namespace PlaylistApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // creates composite unique key for song & playlist
+            modelBuilder.Entity<User>().Property(u => u.Username).HasMaxLength(50);
+            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
             modelBuilder.Entity<PlaylistSong>()
                 .HasIndex(ps => new { ps.PlaylistId, ps.SongId })
-                .IsUnique(); // ensures you cant have 2 of the same song in 1 playlist
+                .IsUnique();
         }
     }
 }

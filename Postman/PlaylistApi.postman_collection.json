@@ -1,0 +1,1023 @@
+{
+  "info": {
+    "_postman_id": "baa2f7e8-887f-4c1d-8ae3-1253cf4d9b23",
+    "name": "PlaylistApi",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48882094",
+    "_collection_link": "https://go.postman.co/collection/48882094-baa2f7e8-887f-4c1d-8ae3-1253cf4d9b23?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Register bob",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"runId\", Date.now());"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+              "pm.collectionVariables.set(\"bobToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\": \"bob_{{runId}}\", \"password\": \"Password123!\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register duplicate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", () => pm.response.to.have.status(400));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\": \"bob_{{runId}}\", \"password\": \"Password123!\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register short password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 400\", () => pm.response.to.have.status(400));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"username\": \"short_{{runId}}\", \"password\": \"abc\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register 2nd user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+              "  pm.collectionVariables.set(\"carolToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"username\": \"carol_{{runId}}\", \"password\": \"Password123!\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login wrong password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401\", () => pm.response.to.have.status(401));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"username\": \"bob_{{runId}}\", \"password\": \"WrongPassword!\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+              "  pm.collectionVariables.set(\"adminToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"username\": \"{{adminUsername}}\", \"password\": \"{{adminPassword}}\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create song w/o logging in",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 401\", () => pm.response.to.have.status(401));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"title\": \"Test\", \"artist\": \"Test\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/songs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create song w/o admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 403\", () => pm.response.to.have.status(403));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/songs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create song with admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));\r",
+              "  pm.collectionVariables.set(\"songId\", pm.response.json().id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"title\": \"Song {{runId}}\", \"artist\": \"Test Artist\", \"duration\": \"00:03:30\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/songs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create song w/o title",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 400\", () => pm.response.to.have.status(400));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"artist\": \"Test Artist\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/songs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get song that doesn't exist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/songs/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs",
+            "999999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create playlist as bob",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));\r",
+              "  pm.collectionVariables.set(\"playlistId\", pm.response.json().id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "  { \"name\": \"Bob's playlist\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get someones playlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 403\", () => pm.response.to.have.status(403));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{carolToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get playlist that doesn't exist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "999999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all playlists w/o admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 403\", () => pm.response.to.have.status(403));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add song to own playlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs/{{songId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}",
+            "songs",
+            "{{songId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add duplicate song",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 409\", () => pm.response.to.have.status(409));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs/{{songId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}",
+            "songs",
+            "{{songId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add song to someones playlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 403\", () => pm.response.to.have.status(403));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{carolToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs/{{songId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}",
+            "songs",
+            "{{songId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get playlist songs w/o logging in",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 401\", () => pm.response.to.have.status(401));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}",
+            "songs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete someones playlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 403\", () => pm.response.to.have.status(403));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{carolToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete own playlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bobToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/playlists/{{playlistId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "playlists",
+            "{{playlistId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete song with admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "  pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/songs/{{songId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "songs",
+            "{{songId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "adminUsername",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "bobToken",
+      "value": ""
+    },
+    {
+      "key": "carolToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "runId",
+      "value": ""
+    },
+    {
+      "key": "songId",
+      "value": ""
+    },
+    {
+      "key": "playlistId",
+      "value": ""
+    }
+  ]
+}

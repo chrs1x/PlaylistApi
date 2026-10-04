@@ -49,7 +49,7 @@ namespace PlaylistApi.Services.SongService
             return song;
         }
 
-        public async Task<Song> DeleteSong(int id)
+        public async Task<Song?> DeleteSong(int id)
         {
             var song = await _context.Songs.FindAsync(id);
             if (song == null) return null;
@@ -59,11 +59,22 @@ namespace PlaylistApi.Services.SongService
         }
 
         // User Actions
-        public async Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId)
+        private async Task<Playlist> GetPlaylistIfAllowed(int playlistId, int userId, bool isAdmin)
         {
-            var playlistSongs = await _context.PlaylistSongs
+            var playlist = await _context.Playlists.FindAsync(playlistId);
+            if (playlist == null)
+                throw new KeyNotFoundException("Playlist not found.");
+            if (playlist.UserId != userId && !isAdmin)
+                throw new UnauthorizedAccessException("You don't have access to this playlist.");
+            return playlist;
+        }
+
+        public async Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId, int userId, bool isAdmin)
+        {
+            await GetPlaylistIfAllowed(playlistId, userId, isAdmin);
+
+            return await _context.PlaylistSongs
                 .Where(ps => ps.PlaylistId == playlistId)
-                .Include(ps => ps.Song)
                 .OrderBy(ps => ps.Order)
                 .Select(ps => new SongWithPlaylistData
                 {
@@ -77,29 +88,22 @@ namespace PlaylistApi.Services.SongService
                     Notes = ps.Notes
                 })
                 .ToListAsync();
-
-            return playlistSongs;
-            
         }
-        public async Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId)
-        {
-            var playlist = await _context.Playlists
-                .Include(p => p.PlaylistSongs)
-                .FirstOrDefaultAsync(p => p.Id == playlistId);
 
-            if (playlist == null) throw new Exception("Playlist not found.");
+        public async Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId, int userId, bool isAdmin)
+        {
+            await GetPlaylistIfAllowed(playlistId, userId, isAdmin);
 
             var song = await _context.Songs.FindAsync(songId);
             if (song == null) throw new KeyNotFoundException("Song not found.");
 
             var exists = await _context.PlaylistSongs
                 .AnyAsync(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
-
             if (exists) throw new InvalidOperationException("Song is already in this playlist.");
 
             var maxOrder = await _context.PlaylistSongs
                 .Where(ps => ps.PlaylistId == playlistId)
-                .MaxAsync(ps => (int?)ps.Order) ?? 0; // if playlist is empty, max order = 0;
+                .MaxAsync(ps => (int?)ps.Order) ?? 0; // empty playlist -> start at 1
 
             var playlistSong = new PlaylistSong
             {
@@ -113,20 +117,20 @@ namespace PlaylistApi.Services.SongService
 
             _context.PlaylistSongs.Add(playlistSong);
             await _context.SaveChangesAsync();
-
             return playlistSong;
         }
-        public async Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId)
+
+        public async Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId, int userId, bool isAdmin)
         {
+            await GetPlaylistIfAllowed(playlistId, userId, isAdmin);
+
             var playlistSong = await _context.PlaylistSongs
                 .FirstOrDefaultAsync(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
-
             if (playlistSong == null)
                 throw new KeyNotFoundException("Song not found in this playlist.");
 
             _context.PlaylistSongs.Remove(playlistSong);
             await _context.SaveChangesAsync();
-
             return playlistSong;
         }
     }

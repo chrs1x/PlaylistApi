@@ -12,9 +12,9 @@ namespace PlaylistApi.Services.SongService
         Task<Song> DeleteSong(int id);
 
         // User actions
-        Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId);
-        Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId);
-        Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId);
+        Task<IEnumerable<SongWithPlaylistData>> GetSongsForPlaylist(int playlistId, int userId, bool isAdmin);
+        Task<PlaylistSong> AddSongToPlaylist(int playlistId, int songId, int userId, bool isAdmin);
+        Task<PlaylistSong> RemoveSongFromPlaylist(int playlistId, int songId, int userId, bool isAdmin);
 
     }
 }

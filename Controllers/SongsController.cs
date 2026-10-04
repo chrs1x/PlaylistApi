@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlaylistApi.DTOs.SongDtos;
 using PlaylistApi.Models;
 using PlaylistApi.Services.SongService;
+using System.Security.Claims;
 
 namespace PlaylistApi.Controllers
 {
@@ -19,13 +20,16 @@ namespace PlaylistApi.Controllers
             _songService = songService;
         }
 
+        private int CurrentUserId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        private bool IsAdmin => User.IsInRole("Admin");
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Song>>> GetAllSongs() => Ok(await _songService.GetAllSongs());
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<Song?>> GetSongById(int id)
+        public async Task<ActionResult<Song>> GetSongById(int id)
         {
             var song = await _songService.GetSongById(id);
             return song == null ? NotFound() : Ok(song);
@@ -35,7 +39,6 @@ namespace PlaylistApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> CreateSong([FromBody] CreateSongDto dto)
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
             var song = await _songService.CreateSong(dto);
             return CreatedAtAction(nameof(GetSongById), new { id = song.Id }, song);
         }
@@ -44,74 +47,55 @@ namespace PlaylistApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> UpdateSong(int id, [FromBody] UpdateSongDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                var updatedSong = await _songService.UpdateSong(id, dto);
-                return Ok(updatedSong);
+                return Ok(await _songService.UpdateSong(id, dto));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Song>> DeleteSong(int id)
         {
-            var success = await _songService.DeleteSong(id);
-            return success == null ? NotFound() : Ok(success);
+            var deleted = await _songService.DeleteSong(id);
+            return deleted == null ? NotFound() : Ok(deleted);
         }
 
         // User actions
 
-        [HttpGet("~/api/playlists/{playlistId}/songs")]
-        [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId)
+        [HttpGet("/api/playlists/{playlistId}/songs")]
+        public async Task<ActionResult<IEnumerable<SongWithPlaylistData>>> GetSongsForPlaylist(int playlistId)
         {
             try
             {
-                var songs = await _songService.GetSongsForPlaylist(playlistId);
-                return Ok(songs);
+                return Ok(await _songService.GetSongsForPlaylist(playlistId, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
         }
-   
 
         [HttpPost("/api/playlists/{playlistId}/songs/{songId}")]
-        public async Task<ActionResult<Song>> AddSongToPlaylist(int playlistId, int songId)
+        public async Task<ActionResult<PlaylistSong>> AddSongToPlaylist(int playlistId, int songId)
         {
             try
             {
-                var playlistSong = await _songService.AddSongToPlaylist(playlistId, songId);
-                return Ok(playlistSong);
+                return Ok(await _songService.AddSongToPlaylist(playlistId, songId, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
+            catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); } // 409: already in playlist
         }
 
         [HttpDelete("/api/playlists/{playlistId}/songs/{songId}")]
-        public async Task<ActionResult<Song>> RemoveSongFromPlaylist(int playlistId, int songId)
+        public async Task<ActionResult<PlaylistSong>> RemoveSongFromPlaylist(int playlistId, int songId)
         {
             try
             {
-                var playlistSong = await _songService.RemoveSongFromPlaylist(playlistId, songId);
-                return Ok(playlistSong);
+                return Ok(await _songService.RemoveSongFromPlaylist(playlistId, songId, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
         }
     }
 }

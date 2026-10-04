@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlaylistApi.DTOs.PlaylistDtos;
 using PlaylistApi.Models;
 using PlaylistApi.Services.PlaylistService;
-using PlaylistApi.Services.SongService;
-using System.Security.Claims;
 
 namespace PlaylistApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] 
     public class PlaylistsController : ControllerBase
     {
         private readonly IPlaylistService _playlistService;
@@ -21,61 +20,45 @@ namespace PlaylistApi.Controllers
             _playlistService = playlistService;
         }
 
+        private int CurrentUserId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        private bool IsAdmin => User.IsInRole("Admin");
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<Playlist>>> GetAllPlaylists() => Ok(await _playlistService.GetAllPlaylists());
+        public async Task<ActionResult<IEnumerable<Playlist>>> GetAllPlaylists() =>
+            Ok(await _playlistService.GetAllPlaylists());
+
+        [HttpGet("user")]
+        public async Task<ActionResult<IEnumerable<Playlist>>> GetUserPlaylists() =>
+            Ok(await _playlistService.GetUserPlaylists(CurrentUserId));
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Playlist?>> GetPlaylistById(int id)
+        public async Task<ActionResult<Playlist>> GetPlaylistById(int id)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var isAdmin = User.IsInRole("Admin");
-
             try
             {
-                var playlist = await _playlistService.GetPlaylistById(id, userId, isAdmin);
-                return Ok(playlist);
+                return Ok(await _playlistService.GetPlaylistById(id, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
         }
 
         [HttpPost]
         public async Task<ActionResult<Playlist>> CreatePlaylist(CreatePlaylistDto dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var playlist = await _playlistService.CreatePlaylist(dto, userId);
+            var playlist = await _playlistService.CreatePlaylist(dto, CurrentUserId);
             return CreatedAtAction(nameof(GetPlaylistById), new { id = playlist.Id }, playlist);
         }
-
+      
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Playlist>> UpdatePlaylist(UpdatePlaylistDto dto, int id)
+        public async Task<ActionResult<Playlist>> UpdatePlaylist(int id, UpdatePlaylistDto dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var isAdmin = User.IsInRole("Admin");
-
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                var updatedPlaylist = await _playlistService.UpdatePlaylist(dto, id, userId, isAdmin);
-                return Ok(updatedPlaylist);
+                return Ok(await _playlistService.UpdatePlaylist(dto, id, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Forbid(ex.Message);
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
         }
 
         [HttpDelete("{id}")]
@@ -83,29 +66,10 @@ namespace PlaylistApi.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                var isAdmin = User.IsInRole("Admin");
-
-                var deleted = await _playlistService.DeletePlaylist(id, userId, isAdmin);
-                return Ok(deleted);
+                return Ok(await _playlistService.DeletePlaylist(id, CurrentUserId, IsAdmin));
             }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Forbid(ex.Message);
-            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message }); }
         }
-
-        [HttpGet("user")]
-        public async Task<ActionResult<IEnumerable<Playlist>>> GetUserPlaylists()
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(await _playlistService.GetUserPlaylists(userId));
-        }
-
-            
     }
 }
