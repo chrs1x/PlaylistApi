@@ -104,7 +104,7 @@ DELETE `/api/songs/{id}` - Delete a song (admin)
 ### Playlists
 GET `/api/playlists` - Get all playlists (admin)
 
-GET `/api/playlists/user` - Get users own playlists
+GET `/api/playlists/user` - Get user's own playlists
 
 GET `/api/playlists/{id}` - Get playlist by ID (owner or admin)
 
@@ -123,11 +123,13 @@ DELETE `/api/playlists/{playlistId}/songs/{songId}` - Remove a song from a playl
 
 ## Testing
 
-The `/postman` folder has 22 automated tests, each one checks the API returns the right status code: 401 when not logged in, 403 for the wrong role or someone else's playlist, 400 for invalid input, 404 when something doesn't exist, and 409 for duplicate songs.
+The `/Postman` folder has 22 automated tests. Each one checks the API returns the right status code: 401 when not logged in, 403 for the wrong role or someone else's playlist, 400 for invalid input, 404 when something doesn't exist, and 409 for duplicate songs.
+
+<img width="1069" height="953" alt="tests" src="https://github.com/user-attachments/assets/3104aa7c-997c-40b0-a3d4-62f12520690c" />
 
 To run them:
 1. Create an admin account 
-2. Import `postman/PlaylistApi.postman_collection.json` into Postman
+2. Import `Postman/PlaylistApi.postman_collection.json` into Postman
 3. In the collection's Variables tab, set `adminUsername` and `adminPassword`
 4. Click **Run** and run all requests in order
 
