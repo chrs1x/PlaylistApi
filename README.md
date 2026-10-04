@@ -1,6 +1,6 @@
 # Playlist API
 
-A backend API built with ASP.NET Core, EF Core, and SQL Server for managing music playlists. Users can create playlists and add songs to them, while admins manage the song catalogue. Secured with JWT authentication and role-based authorisation.
+A backend API built with ASP.NET Core, EF Core, and SQL Server for managing music playlists. Users create playlists and add songs, while admins manage the song catalogue. Secured with JWT authentication and role-based authorisation.
 
 ## Features
 
