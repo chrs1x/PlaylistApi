@@ -62,14 +62,23 @@ Log in again afterwards, so the new token includes the Admin role.
 ## Project Structure
 
 /Controllers - API endpoints
+
 /DTOs - Request and response models
+
 /Models - Domain models
+
 /Services - Business logic and ownership checks
+
 /Data - EF Core DbContext
+
 /Migrations - EF Core migrations
+
 /Utils - JWT token generation
+
 /Postman - Postman test collection 
+
 /Properties - Project settings
+
 Program.cs, appsettings.json
 
 ## API Endpoints
