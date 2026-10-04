@@ -125,8 +125,6 @@ DELETE `/api/playlists/{playlistId}/songs/{songId}` - Remove a song from a playl
 
 The `/Postman` folder has 22 automated tests. Each one checks the API returns the right status code: 401 when not logged in, 403 for the wrong role or someone else's playlist, 400 for invalid input, 404 when something doesn't exist, and 409 for duplicate songs.
 
-<img width="842" height="722" alt="tests" src="https://github.com/user-attachments/assets/5e5d97e5-a15c-4b17-8d34-b09b80513bda" />
-
 To run them:
 1. Create an admin account 
 2. Import `Postman/PlaylistApi.postman_collection.json` into Postman
@@ -134,6 +132,8 @@ To run them:
 4. Click **Run** and run all requests in order
 
 Each run registers its own users, so previous runs won't affect results.
+
+<img width="842" height="722" alt="tests" src="https://github.com/user-attachments/assets/5e5d97e5-a15c-4b17-8d34-b09b80513bda" />
 
 ## Learning Goals
 
