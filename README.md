@@ -51,7 +51,7 @@ A backend API built with ASP.NET Core, EF Core, and SQL Server for managing musi
 ```
    The API runs at `http://localhost:5155`.
 
-### Creating an admin
+### Creating an Admin
 
 New users get the **User** role. To make an admin, register a user, then run:
 ```sql
