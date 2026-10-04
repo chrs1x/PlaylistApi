@@ -67,7 +67,7 @@ Log in again afterwards, so the new token includes the Admin role.
 
 /Models - Domain models
 
-/Services - Business logic and ownership checks
+/Services - Business logic 
 
 /Data - EF Core DbContext
 
@@ -87,39 +87,51 @@ Send the token from register/login as `Authorization: Bearer <token>`.
 
 ### Auth
 POST `/api/auth/register` - Register a new user and get a token
+
 POST `/api/auth/login` - Log in and get a token
 
 ### Songs
 GET `/api/songs` - Get all songs 
+
 GET `/api/songs/{id}` - Get song by ID 
+
 POST `/api/songs` - Add a song to the catalogue (admin)
+
 PATCH `/api/songs/{id}` - Update a song (admin)
+
 DELETE `/api/songs/{id}` - Delete a song (admin)
 
 ### Playlists
 GET `/api/playlists` - Get all playlists (admin)
+
 GET `/api/playlists/user` - Get users own playlists
+
 GET `/api/playlists/{id}` - Get playlist by ID (owner or admin)
+
 POST `/api/playlists` - Create a new playlist
+
 PATCH `/api/playlists/{id}` - Rename a playlist (owner or admin)
+
 DELETE `/api/playlists/{id}` - Delete a playlist (owner or admin)
 
 ### Songs in Playlists
 GET `/api/playlists/{playlistId}/songs` - Get all songs in a playlist (owner or admin)
+
 POST `/api/playlists/{playlistId}/songs/{songId}` - Add a song to a playlist (owner or admin)
+
 DELETE `/api/playlists/{playlistId}/songs/{songId}` - Remove a song from a playlist (owner or admin)
 
 ## Testing
 
-The `/postman` folder contains a collection of 22 automated tests. Each test checks the expected status code, covering authentication (401), roles and ownership (403), validation (400), missing resources (404), and duplicates (409).
+The `/postman` folder has 22 automated tests, each one checks the API returns the right status code: 401 when not logged in, 403 for the wrong role or someone else's playlist, 400 for invalid input, 404 when something doesn't exist, and 409 for duplicate songs.
 
 To run them:
-1. Make sure an admin account exists (see *Creating an admin*)
+1. Create an admin account 
 2. Import `postman/PlaylistApi.postman_collection.json` into Postman
 3. In the collection's Variables tab, set `adminUsername` and `adminPassword`
 4. Click **Run** and run all requests in order
 
-Each run creates its own test users and cleans up the playlist and song it creates.
+Each run registers its own users, so previous runs won't affect results.
 
 ## Learning Goals
 
