@@ -985,11 +985,11 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": ""
+      "value": "http://localhost:5155"
     },
     {
       "key": "adminUsername",
-      "value": ""
+      "value": "admin"
     },
     {
       "key": "adminPassword",
