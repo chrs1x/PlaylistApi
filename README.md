@@ -34,7 +34,7 @@ A backend API built with ASP.NET Core, EF Core, and SQL Server for managing musi
    git clone https://github.com/chrs1x/PlaylistApi.git
    cd PlaylistApi
 ```
-2. Set a JWT signing key (32+ char). It's stored using user-secrets, so it never goes in the repo:
+2. Set a JWT signing key (32+ chars). It's stored using user-secrets, so it never goes in the repo:
 ```
    dotnet user-secrets init
    dotnet user-secrets set "JwtSettings:Key" "<random-32+-character-key>"
